@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Formulaire moderne</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+  <style>
+    :root{
+      --bg:#f6f8fb;
+      --card:#ffffff;
+      --muted:#6b7280;
+      --primary:#6c5ce7;
+      --accent:linear-gradient(90deg,var(--primary),#9b8cff);
+      --error:#ef4444;
+      font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial;
+    }
+    *{box-sizing:border-box}
+    body{margin:0;background:var(--bg);color:#0f172a;display:flex;align-items:center;justify-content:center;min-height:100vh;padding:32px}
+    .container{width:100%;max-width:720px}
+    .card{background:var(--card);border-radius:12px;padding:28px;box-shadow:0 6px 24px rgba(16,24,40,0.06);}
+    h1{margin:0 0 8px;font-size:20px}
+    p.lead{margin:0 0 20px;color:var(--muted)}
+
+    form{display:grid;grid-template-columns:1fr;gap:16px}
+    .field{position:relative;padding-top:12px}
+    input[type="text"], input[type="email"], textarea{
+      width:100%;padding:14px 12px;border:1px solid #e6e9ef;border-radius:8px;background:transparent;font-size:15px;transition:all .18s ease}
+    textarea{min-height:110px;resize:vertical;padding-top:18px}
+
+    /* Floating label */
+    label.floating{position:absolute;left:12px;top:20px;padding:0 6px;background:transparent;color:var(--muted);font-size:13px;pointer-events:none;transition:all .15s ease}
+    input:focus{outline:none;border-color:rgba(108,92,231,0.9);box-shadow:0 6px 20px rgba(108,92,231,0.06)}
+    input:focus + label.floating, input:not(:placeholder-shown) + label.floating, textarea:focus + label.floating, textarea:not(:placeholder-shown) + label.floating{
+      transform:translateY(-24px) scale(.95);background:var(--card);color:var(--primary);padding:0 6px;left:10px
+    }
+
+    .actions{display:flex;gap:12px;align-items:center;margin-top:4px}
+    button.submit{background:var(--accent);color:white;padding:12px 18px;border:none;border-radius:10px;font-weight:600;cursor:pointer;box-shadow:0 8px 20px rgba(108,92,231,0.12);transition:transform .12s ease}
+    button.submit:active{transform:translateY(1px)}
+    .note{color:var(--muted);font-size:13px}
+
+    .error{color:var(--error);font-size:13px;margin-top:6px;display:none}
+    .success{display:none;padding:12px;border-radius:8px;background:linear-gradient(90deg,#ecfdf5,#f0fff4);color:#065f46}
+
+    @media(min-width:720px){form{grid-template-columns:1fr 1fr} .field.full{grid-column:1/-1}}
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="card" role="region" aria-labelledby="form-title">
+      <h1 id="form-title">Formulaire</h1>
+      <p class="lead">Remplissez le formulaire ci-dessous. Les champs marqués d'un astérisque sont obligatoires.</p>
+
+      <form id="modernForm" action="/form" method="post" novalidate>
+        <div class="field">
+          <input type="text" id="name" name="name" placeholder=" " required aria-required="true" aria-describedby="nameHelp">
+          <label class="floating" for="name">Nom *</label>
+          <div id="nameHelp" class="note">Prénom et nom</div>
+          <div class="error" id="nameError">Ce champ est requis.</div>
+        </div>
+
+        <div class="field full">
+          <textarea id="address" name="address" placeholder=" " required aria-required="true" aria-describedby="addressHelp"></textarea>
+          <label class="floating" for="address">Adresse *</label>
+          <div id="addressHelp" class="note">Rue, code postal, ville</div>
+          <div class="error" id="addressError">Veuillez renseigner votre adresse.</div>
+        </div>
+
+        <div class="field full actions">
+          <button type="submit" class="submit">Envoyer</button>
+          <div class="note">Nous respectons votre vie privée.</div>
+        </div>
+      </form>
+
+      <div class="success" id="successBox" role="status" aria-live="polite">Merci ! Le formulaire a bien été envoyé.</div>
+    </div>
+  </div>
+
+  <script>
+    (function(){
+      const form = document.getElementById('modernForm');
+      const name = document.getElementById('name');
+      const address = document.getElementById('address');
+      const nameError = document.getElementById('nameError');
+      const addressError = document.getElementById('addressError');
+      const successBox = document.getElementById('successBox');
+
+      // simple client-side validation
+      form.addEventListener('submit', function(e){
+        let valid = true;
+        nameError.style.display = 'none';
+        addressError.style.display = 'none';
+        successBox.style.display = 'none';
+
+        if(!name.value.trim()){
+          nameError.style.display = 'block';
+          valid = false;
+        }
+        if(!address.value.trim()){
+          addressError.style.display = 'block';
+          valid = false;
+        }
+
+        if(!valid){
+          e.preventDefault();
+          // focus first invalid
+          if(!name.value.trim()) name.focus(); else address.focus();
+          return;
+        }
+
+        // progressive enhancement: show a client-side success message and let the form submit
+        successBox.style.display = 'block';
+      });
+
+      // Accessibility: toggle label state when content is present (for prefilled or autofill)
+      function sync(){
+        [name,address].forEach(el=>{
+          const lbl = el.nextElementSibling;
+          if(!el.value) lbl.classList.remove('active'); else lbl.classList.add('active');
+        });
+      }
+      ['input','change','blur'].forEach(ev=>{name.addEventListener(ev,sync);address.addEventListener(ev,sync)});
+      // initial sync
+      sync();
+    })();
+  </script>
+</body>
+</html>
