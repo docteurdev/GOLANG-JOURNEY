@@ -1,0 +1,9 @@
+Voici un texte aléatoire ajouté pour l'exercice.
+
+Le vent souffle doucement sur la colline.
+Les feuilles dansent comme des notes éparses d'une mélodie oubliée.
+
+Un chat observe la rue, patient et royal ; le monde continue sa course, indifférent aux petites histoires.
+
+Cette ligne finale sert simplement à remplir le fichier avec un contenu lisible et sympathique.
+
